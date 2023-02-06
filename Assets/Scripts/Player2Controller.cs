@@ -4,16 +4,18 @@ using UnityEngine;
 
 public class Player2Controller : MonoBehaviour
 {
-    public float speed;
-    public float highJump;
+    [SerializeField] private SpriteRenderer playerSprite;
+    [SerializeField] private float speed;
+    [SerializeField] private float highJump;
 
     bool facingRight;
     bool grounded;
 
 
 
-    Rigidbody2D mybody;
-    Animator myanimator;
+
+    [SerializeField] Rigidbody2D mybody;
+    [SerializeField] Animator myanimator;
 
     // Start is called before the first frame update
     void Start()
@@ -26,12 +28,21 @@ public class Player2Controller : MonoBehaviour
 
     void FixedUpdate()
     {
+        Debug.Log(message: "run");
         float move = Input.GetAxis("Horizontal");
 
         myanimator.SetFloat("Speed", Mathf.Abs(move));
 
         mybody.velocity = new Vector2(move * speed, mybody.velocity.y);
-        
+
+        void flip()
+        {
+            facingRight = !facingRight;
+            Vector3 theScale = transform.localScale;
+            theScale.x *= -1;
+            transform.localScale = theScale;
+        }
+
         if (move > 0 && !facingRight)
         {
             flip();
@@ -41,7 +52,8 @@ public class Player2Controller : MonoBehaviour
             flip();
         }
 
-        if (Input.GetKey(KeyCode.Space)){
+        if (Input.GetKey(KeyCode.Space))
+        {
             Debug.Log(message: "jump");
             if (grounded)
             {
@@ -51,15 +63,9 @@ public class Player2Controller : MonoBehaviour
         }
     }
 
-    void flip()
-    {
-        facingRight = !facingRight;
-        Vector3 theScale = transform.localScale;
-        theScale.x *= -1;
-        transform.localScale = theScale;
-    }
 
-    private void OnCollisionEnter2D(Collision2D other)
+
+    private void OnCollisionEnter2D(Collision2D other) //va cham
     {
         if (other.gameObject.tag == "Ground")
         {
@@ -67,9 +73,21 @@ public class Player2Controller : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    void die()
     {
-       
+        myanimator.SetBool("die", true);
     }
-}
+
+    private void OnTriggerEnter2D(Collider2D col)
+    {
+        if (col.gameObject.tag=="DeadTouch")
+        {
+            die();
+        }
+    }
+
+
+
+
+
+    }
